@@ -1,7 +1,7 @@
 
 class Evidences:
     """
-    Composite-Component
+    <<Composite-Component>>
     """
 
     def __init__(self):
@@ -14,35 +14,36 @@ class Evidences:
         pass
 
 
-class LeafEvidences:
+class LeafEvidences(Evidences):
     """
-    Composite-leaf
-    """
-    def __init__(self):
-        pass
-
-    def getEvidences(self):
-        pass
-
-    def loadEvidences(self, EvidencesDirSource):
-        pass
-
-class CompositeEvidences:
-    """
-    Composite-composite
+    <<Composite-Leaf>>
     """
     def __init__(self):
-        pass
+        super().__init__()
 
     def getEvidences(self):
-        pass
+        super().getEvidences()
 
     def loadEvidences(self, EvidencesDirSource):
-        pass
+        super().loadEvidences(EvidencesDirSource)
 
-    def add(item:Evidences):
-        pass
 
-    def remove(item:Evidences):
-        pass
+class CompositeEvidences(Evidences):
+    """
+    <<Composite-Composite>>
+    """
+    def __init__(self):
+        super().__init__()
+        self.children = []
 
+    def getEvidences(self):
+        super().getEvidences()
+
+    def loadEvidences(self, EvidencesDirSource):
+        super().loadEvidences(EvidencesDirSource)
+
+    def add(self, item: Evidences):
+        self.children.append(item)
+
+    def remove(self, item: Evidences):
+        self.children.remove(item)
