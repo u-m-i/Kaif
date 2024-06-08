@@ -1,52 +1,47 @@
-
 import os
+from file_resolver import FileResolver
 
-dir_path = ""
-default_output_dir = "./frames"
-EMPTY = ""
+class Parser:
+    """
+    This class allows splitting an evidence file frame by frame.
+    """
+    def __init__(self, output_path: str):
+        """
+        Args:
+            output_path (str): Complete absolute path where the parsed files will be stored.
+        """
+        self.output_dir = FileResolver(output_path)  # Create dir for the parser trajectory
 
-# ====== TEST ======
+    def parse_trajectory(self, trj_file: FileResolver):
+        """
+        Parses the trajectory file and splits it into individual frames.
 
-def path_split_test():
+        Args:
+            trj_file (FileResolver): The trajectory file to be parsed.
+        """
+        new_evd_file = None
 
-    path = '/home/gonzalo/.aloof/CelularAutomata/file_parser.py'
-    splitting = os.path.splitext(path)
+        try:
+            for i, line in enumerate(trj_file.read()):
+                if "Frame" in line:  # If it's a new frame
+                    if new_evd_file:  # If a new evidence file is open, close it
+                        new_evd_file.close()
+                    
+                    # Generate frame file name
+                    file_name = f"Frame-{i:07d}.txt"
+                    new_evd_file_path = os.path.join(self.output_dir, file_name)
+                    new_evd_file = open(new_evd_file_path, 'w')
+                if new_evd_file:  # Write the line to the current evidence file
+                    new_evd_file.write(line)
+        finally:
+            # Ensure the last evidence file is closed
+            if new_evd_file:
+                new_evd_file.close()
+            trj_file.close()
 
-    for i in splitting:
-        print(i + '\n')
-
-# ===
-    if os.path.exists(file) :
-        # Give the option to create one
-        return open(file)
-
-    return open(file)
-
-def parseTrajectory(self, filename):
-
-# Get the file
-
-    if dir_path == "" :
-        name = test_path
-
-    recipient = None
-
-    file = validateFile(filename)
-    
-    line = file.readline()
-
-    while line != EMPTY:
-        if line.find("Frame") != -1:
-
-            # Close a file with content
-            if recipient != None:
-                recipient.close()
-            else:
-                # New file, name it with a 0 pad to the left
-        else:
-            # Add a new line to the file
-
-
-# ===
-
-path_split_test()
+# Usage example:
+# output_path = "path/to/output"
+# trj_file_path = "path/to/trajectory/file"
+# parser = Parser(output_path)
+# trj_file = FileResolver(trj_file_path)
+# parser.parse_trajectory(trj_file)
