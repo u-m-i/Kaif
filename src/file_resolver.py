@@ -1,3 +1,4 @@
+import re
 import os
 import pickle
 from pathlib import Path 
@@ -15,6 +16,11 @@ class FileResolver:
         {name} Name of the file or folder, with only allowed symbols by the OS
         """
 
+        self.encoding = encoding
+
+        if(len(name) == 0):
+            print("[ERR]: Name of the file is an empty string")
+
         # Sanitize input
         result = self._sanitize(path=name)
 
@@ -23,16 +29,17 @@ class FileResolver:
 
         self._resolve_folder(folder_name=prefix)
 
-        # Create the file
-        full_path:str = f"{prefix}/{result}"
+        full_name:str = f"{prefix}/{result}"
 
-        self._resolve_file(file_name=full_path)
+        # Create the file
+        self._resolve_file(file_name=full_name)
+
+
+        self.relative_path:str = full_name
 
         # Save different route versions
-        self.absolute_path:str = full_path
+        self.absolute_path:str = os.path.abspath(full_name)
 
-        self.relative_path:str = result
-        
 
     def _sanitize(self, path:str) -> str:
         """
@@ -42,11 +49,14 @@ class FileResolver:
         # Separete the extension
         [neutral_name, extension] = os.path.splitext(path)
 
+        neutral_name = repr(neutral_name)
+
         # Clean any troublesome symbol in the name
 
-        #index = re.search("", neutral_name).start()
+        result = re.sub(r"[\\/']", "", neutral_name)
 
-        return f"{neutral_name}{extension}"
+        return f"{result}{extension}"
+
     def _resolve_folder(self,folder_name: str) -> str:
         """
         Resolves to create the folder
@@ -62,16 +72,6 @@ class FileResolver:
         Resolves the creation of the file
         {file_name} 
         """
-        # TEST => DO NOT WORK
-        with open(file_name, "a", encoding="utf-8") as file:
+        with open(file_name, "a", encoding = self.encoding) as file:
             return
 
-    def read_inner_file(self, encoding = "utf-8"):
-        """
-        Return the data from the file dispatched and returns its value
-        {encoding} The default value for encoding is utf-8
-        """
-
-        # Gets the content and return it
-        with open(self.absolute_path, "r", encoding = encoding) as data:
-            return data
